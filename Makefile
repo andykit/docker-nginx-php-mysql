@@ -24,10 +24,10 @@ help:
 	@echo "  test                Test application"
 
 init:  
-	@$(shell cp $(shell pwd)/web/edusoho/app/config/parameters.yml.docker.dist $(shell pwd)/web/edusoho/app/config/parameters.yml 2> /dev/null)
-	@$(shell rm -rf $(shell pwd)/web/edusoho/app/cache $(shell pwd)/web/edusoho/app/logs $(shell pwd)/web/edusoho/app/data $(shell pwd)/web/edusoho/web/files $(shell pwd)/web/edusoho/node_modules)
-	@$(shell mkdir -p $(shell pwd)/web/edusoho/app/cache $(shell pwd)/web/edusoho/app/logs $(shell pwd)/web/edusoho/app/data $(shell pwd)/web/edusoho/web/files)
-	@$(shell chmod 777 $(shell pwd)/web/edusoho/app/cache $(shell pwd)/web/edusoho/app/logs $(shell pwd)/web/edusoho/app/data $(shell pwd)/web/edusoho/web/files)
+	@cp $(shell pwd)/web/edusoho/app/config/parameters.yml.docker.dist $(shell pwd)/web/edusoho/app/config/parameters.yml 2> /dev/null
+	@rm -rf $(shell pwd)/web/edusoho/app/cache $(shell pwd)/web/edusoho/app/logs $(shell pwd)/web/edusoho/app/data $(shell pwd)/web/edusoho/web/files $(shell pwd)/web/edusoho/node_modules
+	@mkdir -p $(shell pwd)/web/edusoho/app/cache $(shell pwd)/web/edusoho/app/logs $(shell pwd)/web/edusoho/app/data $(shell pwd)/web/edusoho/web/files
+	@chmod 777 $(shell pwd)/web/edusoho/app/cache $(shell pwd)/web/edusoho/app/logs $(shell pwd)/web/edusoho/app/data $(shell pwd)/web/edusoho/web/files
 
 stable-up: 
 	@if [ -d web/edusoho ]; then git -C web/edusoho pull; else git clone --depth=1 -b stable git@github.com:andykit/ilabweb-es.git web/edusoho; fi
@@ -92,6 +92,6 @@ mysql-restore:
 # 	@make resetOwner
 
 resetOwner:
-	@$(shell chown -Rf $(SUDO_USER):$(shell id -g -n $(SUDO_USER)) $(MYSQL_DUMPS_DIR) "$(shell pwd)/etc/ssl" "$(shell pwd)/web/app" 2> /dev/null)
+	@chown -Rf $(SUDO_USER):$(shell id -g -n $(SUDO_USER)) $(MYSQL_DUMPS_DIR) "$(shell pwd)/etc/ssl" "$(shell pwd)/web/app" 2> /dev/null
 
 .PHONY: clean test init stable-up front-up

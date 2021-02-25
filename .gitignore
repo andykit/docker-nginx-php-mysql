@@ -4,7 +4,6 @@
 
 # Application
 /web/**/**
-/data
 
 # PHPStorm
 .idea/**/workspace.xml
