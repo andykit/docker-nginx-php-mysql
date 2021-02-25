@@ -31,6 +31,7 @@ init:
 
 stable-up: 
 	@if [ -d web/edusoho ]; then git -C web/edusoho pull; else git clone --depth=1 -b stable git@github.com:andykit/ilabweb-es.git web/edusoho; fi
+	@make init
 
 clean:
 	@rm -Rf data/db/mysql/*
