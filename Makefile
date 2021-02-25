@@ -56,7 +56,7 @@ composer-up: code
 yarn-static: code
 	@docker run --rm -v $(shell pwd)/web/edusoho:/app -w "/app" node:lts sh -c "yarn && yarn compile"
 
-mysql-init: code
+mysql-init: 
 	@docker-compose exec -T -w "/var/www/html/edusoho" php  sh -c " php bin/phpmig migrate && php app/console system:init"
 
 mysql-reset:
