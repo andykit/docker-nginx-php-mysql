@@ -49,16 +49,21 @@ clean:
 	@rm -Rf web/app/report
 	@rm -Rf etc/ssl/*
 
-# code-sniff:
-# 	@echo "Checking the standard code..."
-# 	@docker-compose exec -T php ./app/vendor/bin/phpcs -v --standard=PSR2 app/src
-
-composer-up: clone
+# ilabweb专用命令
+composer-up: code
 	@docker run --rm -v $(shell pwd)/web/edusoho:/app andypau/ilabweb-php7-cli sh -c "composer update"
 
-yarn-static: 
+yarn-static: code
 	@docker run --rm -v $(shell pwd)/web/edusoho:/app -w "/app" node:lts sh -c "yarn && yarn compile"
 
+mysql-init: code
+	@docker-compose exec -T -w "/var/www/html/edusoho" php  sh -c " php bin/phpmig migrate && php app/console system:init"
+
+mysql-reset:
+	@docker exec -i $(shell docker-compose ps -q mysqldb) mysql -u"$(MYSQL_ROOT_USER)" -p"$(MYSQL_ROOT_PASSWORD)" -e 'DROP DATABASE `edusoho`' 2>/dev/null
+	@docker exec -i $(shell docker-compose ps -q mysqldb) mysql -u"$(MYSQL_ROOT_USER)" -p"$(MYSQL_ROOT_PASSWORD)" -e 'CREATE DATABASE `edusoho` DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci' 2>/dev/null
+
+# 通用命令
 docker-start: init
 	docker-compose up -d
 
@@ -71,13 +76,6 @@ gen-certs:
 
 logs:
 	@docker-compose logs -f
-
-mysql-reset:
-	@docker exec -i $(shell docker-compose ps -q mysqldb) mysql -u"$(MYSQL_ROOT_USER)" -p"$(MYSQL_ROOT_PASSWORD)" -e 'DROP DATABASE `edusoho`' 2>/dev/null
-	@docker exec -i $(shell docker-compose ps -q mysqldb) mysql -u"$(MYSQL_ROOT_USER)" -p"$(MYSQL_ROOT_PASSWORD)" -e 'CREATE DATABASE `edusoho` DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci' 2>/dev/null
-
-mysql-init:
-	@docker-compose exec -T -w "/var/www/html/edusoho" php  sh -c " php bin/phpmig migrate && php app/console system:init"
 
 mysql-dump:
 	@mkdir -p $(MYSQL_DUMPS_DIR)
@@ -95,6 +93,10 @@ mysql-restore:
 # test: code-sniff
 # 	@docker-compose exec -T php ./app/vendor/bin/phpunit --colors=always --configuration ./app/
 # 	@make resetOwner
+
+# code-sniff:
+# 	@echo "Checking the standard code..."
+# 	@docker-compose exec -T php ./app/vendor/bin/phpcs -v --standard=PSR2 app/src
 
 resetOwner:
 	@$(shell chown -Rf $(SUDO_USER):$(shell id -g -n $(SUDO_USER)) $(MYSQL_DUMPS_DIR) "$(shell pwd)/etc/ssl" "$(shell pwd)/web/app" 2> /dev/null)
