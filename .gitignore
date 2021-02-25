@@ -5,6 +5,8 @@
 # Application
 /web/**/**
 
+/data/db/mysql/**
+
 # PHPStorm
 .idea/**/workspace.xml
 .idea/**/tasks.xml
