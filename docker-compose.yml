@@ -3,7 +3,7 @@ services:
     web:
         image: nginx:alpine
         volumes:
-            - "./etc/nginx/default.prod.conf:/etc/nginx/conf.d/default.conf"
+            - "./etc/nginx/default.conf:/etc/nginx/conf.d/default.conf"
             - "./etc/ssl:/etc/ssl"
             - "./web:/var/www/html"
             - "./etc/nginx/default.template.conf:/etc/nginx/conf.d/default.template"
@@ -27,7 +27,7 @@ services:
         image: andypau/ilabweb-php7-cli
         volumes:
             - "./web/edusoho:/app"
-        command: sh -c "composer update && yarn && yarn compile"
+        command: sh -c "composer update"
     myadmin:
         image: phpmyadmin/phpmyadmin
         container_name: phpmyadmin

@@ -29,31 +29,20 @@ init:
 	@$(shell mkdir -p $(shell pwd)/web/edusoho/app/cache $(shell pwd)/web/edusoho/app/logs $(shell pwd)/web/edusoho/app/data $(shell pwd)/web/edusoho/web/files)
 	@$(shell chmod 777 $(shell pwd)/web/edusoho/app/cache $(shell pwd)/web/edusoho/app/logs $(shell pwd)/web/edusoho/app/data $(shell pwd)/web/edusoho/web/files)
 
-code:
-	@if [ -d web/edusoho ]; then \
-		@git -C web/edusoho pull \
-	else \
-		@git clone --depth=1 -b stable git@github.com:andykit/ilabweb-es.git web/edusoho; \
-	fi
-
-# apidoc:
-# 	@docker run --rm -v $(shell pwd):/data phpdoc/phpdoc -i=vendor/ -d /data/web/app/src -t /data/web/app/doc
-# 	@make resetOwner
+stable-up: 
+	@if [ -d web/edusoho ]; then git -C web/edusoho pull; else git clone --depth=1 -b stable git@github.com:andykit/ilabweb-es.git web/edusoho; fi
 
 clean:
 	@rm -Rf data/db/mysql/*
 	@rm -Rf $(MYSQL_DUMPS_DIR)/*
-	@rm -Rf web/app/vendor
-	@rm -Rf web/app/composer.lock
-	@rm -Rf web/app/doc
-	@rm -Rf web/app/report
 	@rm -Rf etc/ssl/*
+	@rm -Rf web/*
 
 # ilabweb专用命令
-composer-up: code
+composer-up: stable-up
 	@docker run --rm -v $(shell pwd)/web/edusoho:/app andypau/ilabweb-php7-cli sh -c "composer update"
 
-yarn-static: code
+front-up: stable-up
 	@docker run --rm -v $(shell pwd)/web/edusoho:/app -w "/app" node:lts sh -c "yarn && yarn compile"
 
 mysql-init: 
@@ -98,7 +87,11 @@ mysql-restore:
 # 	@echo "Checking the standard code..."
 # 	@docker-compose exec -T php ./app/vendor/bin/phpcs -v --standard=PSR2 app/src
 
+# apidoc:
+# 	@docker run --rm -v $(shell pwd):/data phpdoc/phpdoc -i=vendor/ -d /data/web/app/src -t /data/web/app/doc
+# 	@make resetOwner
+
 resetOwner:
 	@$(shell chown -Rf $(SUDO_USER):$(shell id -g -n $(SUDO_USER)) $(MYSQL_DUMPS_DIR) "$(shell pwd)/etc/ssl" "$(shell pwd)/web/app" 2> /dev/null)
 
-.PHONY: clean test init code
+.PHONY: clean test init stable-up front-up
